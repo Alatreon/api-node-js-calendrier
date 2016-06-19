@@ -37,13 +37,14 @@ var apiRoutes = express.Router();
 // place les routes contenues dans "apiRoutes" avant /api/*
 app.use('/v1/api', apiRoutes);
 
-// creer un nouveau compte (POST http://localhost:8080/api/signup)
+// creer un nouveau compte (POST http://localhost:8080/api/signup
 apiRoutes.post('/signup', function(req, res) 
 {
 
   res.header("Access-Control-Allow-Origin", "*");
   
-  // res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  //res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
   if (!req.body.name || !req.body.password || !req.body.email)
   {
     res.json({success: false, msg: 'Formulaire non valide.'});
@@ -59,11 +60,21 @@ apiRoutes.post('/signup', function(req, res)
     // sauvegarde de l'utilisateur
     newUser.save(function(err)
     {
-      if (err) 
+      if (err)
       {
-        return res.json({success: false, msg: "L'utilisateur existe déjà. "+err});
+        if(err.code==11000)
+        {
+          return res.json({success: false, msg: "L'utilisateur existe déjà. "});
+        }
+        else
+        {
+          return res.json({success: false, msg: err});
+        }
       }
-      res.json({success: true, msg: 'Utilisateur créer.'});
+      else
+      {
+        res.json({success: true, msg: 'Utilisateur créer.'});
+      }
     });
   }
 });
@@ -72,8 +83,10 @@ apiRoutes.post('/signup', function(req, res)
 // autentification d'un utilisateur a user (POST http://localhost:8080/api/authenticate)
 apiRoutes.post('/authenticate', function(req, res) 
 {
+  res.header("Access-Control-Allow-Origin", "*");
+
   User.findOne({
-    name: req.body.name
+    email: req.body.email
   }, function(err, user) 
   {
     if (err) throw err;
@@ -92,7 +105,7 @@ apiRoutes.post('/authenticate', function(req, res)
           // if user is found and password is right create a token
           var token = jwt.encode(user, config.secret);
           // return the information including token as JSON
-          res.json({success: true, token: 'JWT ' + token});
+          res.json({success: true, token: 'JWT ' + token, msg: "Connecté"});
         }
         else 
         {
