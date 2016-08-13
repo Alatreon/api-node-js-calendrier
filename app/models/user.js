@@ -4,16 +4,20 @@ var bcrypt = require('bcrypt');
  
 // set up a mongoose model
 var UserSchema = new Schema({
+  email: {
+        type: String,
+        required: true,
+        unique:true
+    },
   name: {
         type: String,
-        unique: true,
-        required: true
+        required: true,
+    },
+  lastname: {
+        type: String,
+        required: true,
     },
   password: {
-        type: String,
-        required: true
-    },
-  email: {
         type: String,
         required: true
     },
@@ -45,8 +49,8 @@ UserSchema.pre('save', function (next) {
                 next();
             });
         });
-    } 
-    else 
+    }
+     else 
     {
         return next();
     }
