@@ -135,56 +135,9 @@ apiRoutes.post('/authenticate', function(req, res)
 
 // route pour   un menbre (GET http://localhost:8080/api/memberinfo)
 
-  apiRoutes.get('/memberinfo', function(req, res, next) {
-
-    if(getToken(req.headers)==null)
-    {
-      res.status(403).send({success: false, msg: 'Aucun token fournie.'});
-    }
-    else
-    {
-      passport.authenticate('jwt', function(err, user, info) {
-      var token = getToken(req.headers);
-
-        try
-        {
-          var decoded = jwt.decode(token, config.secret);
-
-              User.findOne({
-                  name: decoded.name
-              },
-              function(err, user) 
-              {
-              if (err) throw err;
-              
-              if (!user)
-              {
-                return res.status(403).send({success: false, msg: "L'utilisateur n'existe pas."});
-              }
-              else 
-              {
-                res.json(
-                  {
-                    success: true,
-                    info: {
-                      id:user._id,
-                      name:user.name,
-                      email:user.email,
-                      lastname:user.lastname,
-                      role:"Assistant Qualité"
-                    }
-                  });
-              };
-          });
-        }
-        catch(err)
-        {
-          res.status(403).send({success: false, msg: "Le token fourni ne correspond pas à la structure d'un token"})
-        }
-
-      })(req, res, next);
-    }
-  });
+apiRoutes.get('/memberinfo', function(req, res, next) {
+  getUserInfo(req.headers);
+});
 
 apiRoutes.get('/users', function(req, res)
 {
@@ -238,6 +191,17 @@ apiRoutes.post('/addtask', function(req, res)
   });
 });
 
+apiRoutes.post('/deltask/:id', function(req, res) 
+{
+  Task.remove({
+    _id:req.params.id
+  },
+  function(err,removed)
+  {
+    console.log(err+' | '+removed)
+  });
+});
+
 // apiRoutes.get('/user/:username', function(req, res) 
 // {
 //   if(req.params.username!=null)
@@ -275,6 +239,7 @@ apiRoutes.get('/usertask/:userid', function(req, res)
         for(var i=0; i<Object.keys(user).length; i++)
         {
           var item = {
+            "id":user[i]._id,
             "user":user[i].user,
             "name":user[i].name,
             "start":user[i].start,
@@ -302,6 +267,55 @@ apiRoutes.get('/usertask/:userid', function(req, res)
   }
 });
 
+getUserInfo = function (headers)
+{
+    if(getToken(headers)==null)
+    {
+      res.status(403).send({success: false, msg: 'Aucun token fournie.'});
+    }
+    else
+    {
+      passport.authenticate('jwt', function(err, user, info) {
+      var token = getToken(headers);
+
+        try
+        {
+          var decoded = jwt.decode(token, config.secret);
+
+              User.findOne({
+                  name: decoded.name
+              },
+              function(err, user) 
+              {
+              if (err) throw err;
+              
+              if (!user)
+              {
+                return res.status(403).send({success: false, msg: "L'utilisateur n'existe pas."});
+              }
+              else 
+              {
+                res.json(
+                  {
+                    success: true,
+                    info: {
+                      id:user._id,
+                      name:user.name,
+                      email:user.email,
+                      lastname:user.lastname,
+                      role:"Assistant Qualité"
+                    }
+                  });
+              };
+          });
+        }
+        catch(err)
+        {
+          res.status(403).send({success: false, msg: "Le token fourni ne correspond pas à la structure d'un token"})
+        }
+
+      })(req, res, next);
+}
 
 getToken = function (headers) 
 {

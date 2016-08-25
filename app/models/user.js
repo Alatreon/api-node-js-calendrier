@@ -28,6 +28,10 @@ var UserSchema = new Schema({
   tasks:[{
         type: Schema.Types.ObjectId,
         ref: 'Task'
+    }],
+  tasks:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Roles'
     }]
 });
 
