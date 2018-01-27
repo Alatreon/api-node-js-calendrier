@@ -1,7 +1,7 @@
-node 5.9.1
-quelque soit la version de NodeJs, la verion de npm doit etre inferieur a 3.
-Python 2.7 et un compilateur C++ doivent etre installé pour le module node-gyp
-mongoDB 3.2.4
+<p> Node 5.9.1 </p>
+<p> Quelque soit la version de NodeJs, la verion de npm doit etre inferieur a 3. </p>
+<p> Python 2.7 et un compilateur C++ doivent etre installé pour le module node-gyp </p>
+<p> MongoDB 3.2.4 </p>
 
 Postman :
 
